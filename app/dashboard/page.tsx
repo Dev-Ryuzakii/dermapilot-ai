@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowRight, CalendarDays, ScanFace, ShoppingBag, Sparkles } from 'lucide-react';
+import { useLiveData } from '@/lib/use-live-data';
 
 type Summary = { profile?: { display_name?: string; currency?: string }; scans: any[]; routines: any[] };
 
 export default function DashboardPage() {
   const [data, setData] = useState<Summary>({ scans: [], routines: [] });
 
-  useEffect(() => {
+  const load = () => {
     Promise.all([
       fetch('/api/profile').then(response => response.json()),
       fetch('/api/history').then(response => response.json()),
@@ -19,7 +20,9 @@ export default function DashboardPage() {
       scans: Array.isArray(scans?.assessments) ? scans.assessments : [],
       routines: Array.isArray(routines) ? routines : [],
     })).catch(() => {});
-  }, []);
+  };
+  useEffect(() => { load(); }, []);
+  useLiveData(load, ['skin_assessments', 'skincare_routines', 'profiles']);
 
   const latest = data.scans[0];
   return <>

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { apiUrl, anonKey, currentUser, names } from '@/lib/auth';
 import { analyzeWithYouCam, YouCamImageError } from '@/lib/youcam';
 import { saveScanSnapshots } from '@/lib/scan-snapshots';
+import { hasScanConsent } from '@/lib/consent';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -22,15 +23,9 @@ export async function POST(request: Request) {
     const form = await request.formData();
     const image = form.get('image');
     if (!(image instanceof File) || !imageTypes.has(image.type) || image.size === 0 || image.size > 8 * 1024 * 1024) return result('Choose a JPEG, PNG, or WebP image smaller than 8 MB.', 400);
-    if (form.get('consent') !== 'true') return result('Consent is required before image processing.', 400);
+    if (!(await hasScanConsent(uid))) return result('Review and accept scan consent before processing your image.', 403);
     const api = apiUrl();
     const key = anonKey();
-    const consentWrite = await fetch(`${api}/rest/v1/scan_consents`, {
-      method: 'POST', cache: 'no-store',
-      headers: { apikey: key, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ user_id: uid, consent_version: '2026-10-snapshots', consented: true, purpose: 'YouCam cosmetic skin analysis and private Afribase snapshot storage', granted: true, policy_version: '2026-10-snapshots' }),
-    });
-    if (!consentWrite.ok) throw new Error(`Could not save your scan consent (${consentWrite.status}). Please retry.`);
 
     const analysis = await analyzeWithYouCam(image);
     provider = analysis.provider;

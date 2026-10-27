@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Camera, Info, ScanFace, Sparkles } from 'lucide-react';
+import { useLiveData } from '@/lib/use-live-data';
 
 type Metric = { metric_key: string; label: string; score: number; severity?: string | null };
 type Visual = { key: string; label: string; region: string; score: number | null; skin_type: string | null; url: string };
@@ -46,7 +47,7 @@ export default function ResultsPage() {
     finally { setSavingSnapshots(false); }
   }
 
-  useEffect(() => {
+  const load = () => {
     const id = new URLSearchParams(window.location.search).get('id');
     fetch('/api/history', { cache: 'no-store' })
       .then(async response => {
@@ -59,13 +60,16 @@ export default function ResultsPage() {
         const selected = id ? rows.find(row => row.id === id) : rows[0];
         if (selected) {
           setScan(selected);
+          setError('');
           const warning = sessionStorage.getItem(`snapshot-warning:${selected.id}`);
           if (warning) { setSnapshotWarning(warning); sessionStorage.removeItem(`snapshot-warning:${selected.id}`); }
         }
-        else setError('No saved scan found yet. Start a scan to see your results here.');
+        else { setScan(null); setError('No saved scan found yet. Start a scan to see your results here.'); }
       })
       .catch(cause => setError(cause instanceof Error ? cause.message : 'Could not load your scans.'));
-  }, []);
+  };
+  useEffect(() => { load(); }, []);
+  useLiveData(load, ['skin_assessments']);
 
   return <>
     <Link href="/dashboard/history" className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--muted)]"><ArrowLeft size={15}/>Back to history</Link>

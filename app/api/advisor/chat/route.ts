@@ -3,6 +3,7 @@ import { currentUser } from '@/lib/auth';
 import { userRequest } from '@/lib/actions';
 import { normalizeMetrics, normalizeSkinTypes } from '@/lib/youcam';
 import { rankProducts, type Product, type UserPrefs } from '@/lib/recommendations';
+import { hasChatConsent, productPreferences } from '@/lib/consent';
 
 export const runtime = 'nodejs';
 
@@ -31,8 +32,8 @@ function responseText(payload: any): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => null);
-    if (!body || body.consent !== true || !validMessage({ role: 'user', content: body.message })) {
-      return NextResponse.json({ error: 'Enter a question and agree to share scan scores and preferences with OpenAI.' }, { status: 400 });
+    if (!body || !validMessage({ role: 'user', content: body.message })) {
+      return NextResponse.json({ error: 'Enter a skincare question.' }, { status: 400 });
     }
     const key = process.env.OPENAI_API_KEY;
     if (!key) return NextResponse.json({ error: 'AI chat is not configured yet.' }, { status: 503 });
@@ -48,13 +49,14 @@ export async function POST(request: NextRequest) {
       userRequest('/rest/v1/skincare_products?select=*&active=eq.true'),
     ]);
     const profile = profiles?.[0] || {};
+    if (!hasChatConsent(profile.preferences)) return NextResponse.json({ error: 'Review and accept AI chat consent before sending a question.' }, { status: 403 });
     const scan = (assessments || [])[0] as Assessment | undefined;
     if (selectedId && !scan) return NextResponse.json({ error: 'That scan is not available in your account. Open a saved scan and try again.' }, { status: 404 });
     const prefs: UserPrefs = {
       budget: Number(profile.budget) || 0,
       currency: typeof profile.currency === 'string' ? profile.currency : 'NGN',
       skin_goals: Array.isArray(profile.skin_goals) ? profile.skin_goals.filter((goal: unknown) => typeof goal === 'string').slice(0, 12) : [],
-      preferences: profile.preferences && typeof profile.preferences === 'object' ? profile.preferences : {},
+      preferences: productPreferences(profile.preferences),
     };
     const catalog = rankProducts((products || []) as Product[], prefs).slice(0, 12).map(({ product }) => ({
       name: product.name,

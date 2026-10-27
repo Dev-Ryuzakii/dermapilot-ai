@@ -1,0 +1,11 @@
+Subject: Welcome to DermaPilot
+
+Welcome to DermaPilot.
+
+Your skincare space is ready. Start with a clear selfie, review your YouCam skin analysis, and use your saved results to make more informed routine choices over time.
+
+Open DermaPilot: {{APP_URL}}
+
+Your photos and scan snapshots are private to your account. DermaPilot offers cosmetic guidance, not a medical diagnosis.
+
+— The DermaPilot team
