@@ -1,0 +1,2 @@
+import { NextRequest,NextResponse } from 'next/server';import { userRequest } from '@/lib/actions';
+export async function GET(req:NextRequest){try{const params=new URLSearchParams({select:'*',active:'eq.true',order:'name.asc'});const q=req.nextUrl.searchParams;const category=q.get('category');if(category&&category!=='all')params.set('category',`eq.${category}`);const rows=await userRequest(`/rest/v1/skincare_products?${params}`);return NextResponse.json(rows);}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Catalog unavailable.'},{status:401});}}

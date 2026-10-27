@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="112" viewBox="0 0 440 112" role="img" aria-labelledby="title">
+  <title id="title">DermaPilot AI leaf orbit logo</title>
+  <circle cx="56" cy="56" r="49" fill="#176a50"/>
+  <path d="M76 30C52 29 34 40 31 60c-2 17 10 28 26 25 20-3 28-26 19-55Z" fill="none" stroke="#e4f2e9" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M37 78c8-13 19-24 32-33" fill="none" stroke="#e4f2e9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M85 24a46 46 0 0 1 13 25" fill="none" stroke="#d79a47" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="99" cy="55" r="4" fill="#d79a47"/>
+  <text x="126" y="70" fill="#17231e" font-family="Manrope,Arial,sans-serif" font-size="48" font-weight="800" letter-spacing="-3">derma<tspan fill="#176a50">pilot</tspan></text>
+  <text x="357" y="43" fill="#176a50" font-family="Manrope,Arial,sans-serif" font-size="15" font-weight="800" letter-spacing="1">AI</text>
+</svg>

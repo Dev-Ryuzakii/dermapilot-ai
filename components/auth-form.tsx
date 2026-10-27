@@ -1,0 +1,24 @@
+'use client';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {ArrowRight,Eye,EyeOff,LoaderCircle,Mail,ShieldCheck} from 'lucide-react';
+type Mode='login'|'signup'|'recovery';
+export default function AuthForm({sessionExpired=false,nextPath='/dashboard'}:{sessionExpired?:boolean;nextPath?:string}){
+ const [mode,setMode]=useState<Mode>(sessionExpired?'login':'signup');const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[visible,setVisible]=useState(false);const[message,setMessage]=useState('');const[error,setError]=useState(false);const[busy,setBusy]=useState(false);const router=useRouter();
+ async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);setMessage('');setError(false);try{const response=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:mode,email,password})});const body=await response.json();if(!response.ok)throw new Error(body.error||'Please try again.');setMessage(body.message||'All set.');if(mode==='login')router.replace(nextPath);else if(mode==='signup'&&!body.confirmationRequired)router.replace('/dashboard/onboarding');}catch(err){setError(true);setMessage(err instanceof Error?err.message:'Authentication failed.')}finally{setBusy(false)}}
+ const selectMode=(next:Mode)=>{setMode(next);setMessage('');setError(false)};
+ const title=mode==='signup'?'Create your account':mode==='login'?'Welcome back':'Reset your password';
+ return <section className="rounded-3xl border-2 border-[var(--brand)]/40 bg-white p-5 shadow-[0_20px_60px_rgba(23,49,36,.08)] ring-1 ring-[var(--brand)]/10 sm:p-7">
+  {mode!=='recovery'&&<div className="mb-6 grid grid-cols-2 rounded-xl border border-[var(--line)] bg-[var(--soft)] p-1"><button type="button" onClick={()=>selectMode('signup')} className={`rounded-lg px-3 py-2.5 text-sm font-semibold ${mode==='signup'?'bg-white text-[var(--ink)] shadow-sm':'text-[var(--muted)]'}`}>Create account</button><button type="button" onClick={()=>selectMode('login')} className={`rounded-lg px-3 py-2.5 text-sm font-semibold ${mode==='login'?'bg-white text-[var(--ink)] shadow-sm':'text-[var(--muted)]'}`}>Sign in</button></div>}
+  <h2 className="display text-2xl font-bold">{title}</h2><p className="mt-2 text-sm leading-6 text-[var(--muted)]">{sessionExpired&&mode==='login'?'Your session ended. Sign in again to continue.':mode==='signup'?'Start building a skincare practice that fits your life.':mode==='login'?'Pick up where your skin journey left off.':'We’ll send a password reset link if there is an account for that address.'}</p>
+  <form onSubmit={submit} className="mt-6 space-y-4">
+   <label className="field-label">Email address<span className="relative mt-2 block"><Mail size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]"/><input className="field-input !pl-11" type="email" required autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/></span></label>
+   {mode!=='recovery'&&<label className="field-label">Password<span className="relative mt-2 block"><ShieldCheck size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]"/><input className="field-input !pl-11 !pr-12" type={visible?'text':'password'} minLength={8} required autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="At least 8 characters"/><button type="button" aria-label={visible?'Hide password':'Show password'} onClick={()=>setVisible(!visible)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--muted)]">{visible?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label>}
+   {mode==='login'&&<div className="text-right"><button type="button" onClick={()=>selectMode('recovery')} className="text-sm font-semibold text-[var(--brand)] hover:underline">Forgot password?</button></div>}
+   {message&&<p role="status" className={`rounded-xl border px-3 py-2.5 text-sm ${error?'border-red-200 bg-red-50 text-red-700':'border-[var(--line)] bg-[var(--soft)] text-[var(--brand-dark)]'}`}>{message}</p>}
+   <button disabled={busy} className="primary-button flex w-full items-center justify-center gap-2 disabled:opacity-60">{busy?<><LoaderCircle size={17} className="animate-spin"/>Please wait</>:<>{mode==='signup'?'Create account':mode==='login'?'Sign in':'Send reset link'}<ArrowRight size={16}/></>}</button>
+  </form>
+  {mode==='recovery'&&<button type="button" onClick={()=>selectMode('login')} className="mt-5 text-sm font-semibold text-[var(--brand)] hover:underline">Back to sign in</button>}
+  <p className="mt-5 text-center text-xs leading-5 text-[var(--muted)]">By continuing, you agree to use DermaPilot for cosmetic guidance only, not medical diagnosis.</p>
+ </section>
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="112" viewBox="0 0 440 112" role="img" aria-labelledby="title">
+  <title id="title">DermaPilot AI leaf scan logo</title>
+  <rect x="4" y="4" width="104" height="104" rx="27" fill="#e4f2e9"/>
+  <path d="M76 30C52 29 34 40 31 60c-2 17 10 28 26 25 20-3 28-26 19-55Z" fill="none" stroke="#176a50" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M37 78c8-13 19-24 32-33" fill="none" stroke="#176a50" stroke-width="5" stroke-linecap="round"/>
+  <path d="M17 57h8m69 0h8M60 13v9m0 68v9" stroke="#176a50" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+  <circle cx="60" cy="57" r="3.5" fill="#d79a47"/>
+  <text x="128" y="71" fill="#17231e" font-family="Manrope,Arial,sans-serif" font-size="48" font-weight="800" letter-spacing="-3">derma<tspan fill="#176a50">pilot</tspan></text>
+  <rect x="359" y="42" width="49" height="29" rx="14.5" fill="#f0f3ee"/>
+  <text x="373" y="61" fill="#176a50" font-family="Manrope,Arial,sans-serif" font-size="13" font-weight="800" letter-spacing="1.5">AI</text>
+</svg>
